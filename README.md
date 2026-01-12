@@ -1,47 +1,60 @@
-🌆 SimpleCity
-A lightweight 2D metaverse where pixels meet people.
+# 🌆 SimpleCity
 
-(Replace this line with a screenshot or gif of your game)
+**A lightweight 2D metaverse where pixels meet people.**
 
-🎮 About The Game
-SimpleCity is a virtual 2D open world designed for social interaction and exploration. It moves away from complex 3D requirements to offer a retro, accessible metaverse experience directly in the browser.
+![SimpleCity Preview](https://dummyimage.com/1200x600/1f2937/ffffff&text=SimpleCity+2D+Metaverse)
 
-The goal is simple: Connect, Explore, and Create.
+---
 
-Core Experience
-Virtual Hangout: Walk around a persistent 2D city with friends in real-time.
+## 🎮 About The Game
 
-Socialize: Chat with other players via text/proximity voice.
+**SimpleCity** is a browser-based **2D open-world social experience** focused on real-time interaction and exploration.  
+It strips away heavy 3D complexity and brings back the charm of **retro pixel worlds**, making the metaverse accessible to everyone.
 
-Explore: Discover different zones, buildings, and hidden easter eggs.
+The goal is simple:
 
-Avatar Customization: Create a pixel-art character that represents you.
+> **Connect. Explore. Create.**
 
-🛠️ Built With
-Frontend: [e.g., React, Phaser.js, HTML5 Canvas]
+---
 
-Backend: [e.g., Node.js, Socket.io, Go]
+## 🌍 Core Experience
 
-Database: [e.g., MongoDB, PostgreSQL]
+### 🏙️ Virtual Hangout
+Walk around a **persistent 2D city** with other players in real time.
 
-🚀 Getting Started
-To run SimpleCity locally:
+### 💬 Socialize
+- Real-time text chat  
+- Proximity-based interactions (voice support planned)
 
-Clone the repo
+### 🧭 Explore
+Discover:
+- Unique zones and buildings  
+- Hidden easter eggs  
+- Interactive areas
 
-Bash
+### 🎨 Avatar Customization
+Create and customize your own **pixel-art avatar** to represent you in the city.
 
+---
+
+## 🛠️ Tech Stack
+
+### Frontend
+- React  
+- Phaser.js  
+- HTML5 Canvas  
+
+### Backend
+- Node.js / Go  
+- WebSockets (real-time multiplayer)
+
+### Database
+- MongoDB / PostgreSQL
+
+---
+
+## 🚀 Getting Started
+
+### 1️⃣ Clone the repository
+```bash
 git clone https://github.com/yourusername/SimpleCity.git
-Install dependencies
-
-Bash
-
-cd SimpleCity
-npm install
-Start the server
-
-Bash
-
-npm start
-🤝 Contributing
-Feel free to open an issue or submit a pull request if you want to help expand the city!
