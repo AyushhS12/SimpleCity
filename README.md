@@ -45,7 +45,7 @@ Create and customize your own **pixel-art avatar** to represent you in the city.
 - HTML5 Canvas  
 
 ### Backend
-- Node.js / Go  
+- Rust ( Axum )
 - WebSockets (real-time multiplayer)
 
 ### Database
