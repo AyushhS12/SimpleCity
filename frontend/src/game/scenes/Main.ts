@@ -91,7 +91,7 @@ export default class MainScene extends Phaser.Scene {
         // });
 
         try {
-            this.socket = new WebSocket("ws://localhost:7878/world/")
+            this.socket = new WebSocket("ws://localhost:7878/world")
             this.socket.binaryType = "arraybuffer"
             this.socket.onmessage = (e) => {
                 const view = new DataView(e.data);
