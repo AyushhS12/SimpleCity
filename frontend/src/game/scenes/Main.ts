@@ -1,3 +1,4 @@
+import { extractSnapshotFromDataview } from "../../utils/extract";
 import { PlayerGroup, PlayerSprite } from "../Entities/Player";
 
 type Keys = {
@@ -7,14 +8,17 @@ type Keys = {
     down: Phaser.Input.Keyboard.Key
 }
 
-type Position = {
-    x: number,
-    y: number
-}
+
+
+// type Position = {
+//     x: number,
+//     y: number
+// }
 
 export default class MainScene extends Phaser.Scene {
     cursors!: Phaser.Types.Input.Keyboard.CursorKeys
     player!: PlayerSprite;
+    players!: string[];
     keys!: Keys
     socket!: WebSocket
     constructor() {
@@ -89,21 +93,6 @@ export default class MainScene extends Phaser.Scene {
         //     collidingTileColor: new Phaser.Display.Color(243, 234, 48, 255),
         //     faceColor: new Phaser.Display.Color(40, 39, 37, 255)
         // });
-
-        try {
-            this.socket = new WebSocket("ws://localhost:7878/world")
-            this.socket.binaryType = "arraybuffer"
-            this.socket.onmessage = (e) => {
-                const view = new DataView(e.data);
-                const position: Position = { x: view.getFloat32(0, true), y: view.getFloat32(4, true) };
-                console.log(position);
-            }
-            this.socket.onclose = (e) => {
-                console.log(e)
-            }
-        } catch (e) {
-            console.log(e)
-        }
     }
 
     private static speed = 100;

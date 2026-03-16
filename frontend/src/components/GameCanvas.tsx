@@ -1,6 +1,6 @@
 import { useCallback,/* useContext ,*/ useEffect, useRef } from "react";
 import Phaser from "phaser";
-import { config } from "../game/Game";
+import { config, MyGame } from "../game/Game";
 // import { PlayerContext } from "../context/PlayerContext";
 import axios from "axios";
 import toast, { ErrorIcon } from "react-hot-toast";
@@ -44,7 +44,7 @@ export default function GameCanvas() {
 
   useEffect(() => {
     if (!gameRef.current) {
-      gameRef.current = new Phaser.Game({
+      gameRef.current = new MyGame({
         ...config,
         parent: "phaser-container",
       });

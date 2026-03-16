@@ -3,10 +3,13 @@ import type { Player } from "../../utils/models";
 export class PlayerSprite extends Phaser.Physics.Arcade.Sprite {
 
     private nameTag: Phaser.GameObjects.Text;
+    public id: string
 
     constructor(scene: Phaser.Scene, x: number, y: number, texture: string) {
         super(scene, x, y, texture)
         const player = scene.registry.get("player") as Player
+        console.log(player)
+        this.id = player._id.$oid
         this.nameTag = scene.add.text(x, y - 20, player.username, { fontSize: '12px' }).setOrigin(0.5)
     }
 

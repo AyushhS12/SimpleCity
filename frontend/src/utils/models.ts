@@ -4,7 +4,7 @@ interface Id {
 }
 
 export interface Player {
-    id: Id,
+    _id: Id,
     name: string,
     username: string,
     email: string,
