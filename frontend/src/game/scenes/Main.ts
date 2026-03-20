@@ -137,7 +137,7 @@ export default class MainScene extends Phaser.Scene {
                 this.player.anims.timeScale = 0.3;
                 return
             }
-            this.network.sendMove(this.player.id,this.player.x,this.player.y)
+            this.network.sendMove(this.player.x,this.player.y)
             moving = false
         }
 

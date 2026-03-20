@@ -5,6 +5,7 @@ export const PlayerSize = 12
 // # Snapshot extraction logic
 export type Snapshot = {
     room_id: string,
+    current_player: Uint8Array
     players: string[]
 }
 
@@ -22,7 +23,8 @@ export const extractSnapshotFromDataview = (buffer: ArrayBuffer): Snapshot => {
     const players = [];
     // const decoder = new TextDecoder("utf-8")
     const count = bytes[17];
-    let offset = 18;
+    const current = bytes.slice(18, 30)
+    let offset = 30;
     for (let i = 0; i < count; i++) {
         const id = bytes.subarray(offset, offset + PlayerSize);
 
@@ -35,7 +37,7 @@ export const extractSnapshotFromDataview = (buffer: ArrayBuffer): Snapshot => {
 
         offset += PlayerSize;
     }
-    return { room_id: room, players }
+    return { room_id: room, current_player: current, players }
 }
 
 export const extractPlayerMoveFromBuffer = (buffer: ArrayBuffer): MoveEvent => {
@@ -44,7 +46,7 @@ export const extractPlayerMoveFromBuffer = (buffer: ArrayBuffer): MoveEvent => {
     const [x, y] = [bytes[13], bytes[14]]
     return {
         player: id,
-        x, 
+        x,
         y
     }
 }
