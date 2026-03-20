@@ -1,5 +1,7 @@
-import { extractSnapshotFromDataview } from "../../utils/extract";
+import type { MoveEvent, Snapshot } from "../../utils/extract";
 import { PlayerGroup, PlayerSprite } from "../Entities/Player";
+import type { MyGame } from "../Game";
+import type NetworkManager from "../network/NetworkManager";
 
 type Keys = {
     up: Phaser.Input.Keyboard.Key,
@@ -8,19 +10,13 @@ type Keys = {
     down: Phaser.Input.Keyboard.Key
 }
 
-
-
-// type Position = {
-//     x: number,
-//     y: number
-// }
-
 export default class MainScene extends Phaser.Scene {
     cursors!: Phaser.Types.Input.Keyboard.CursorKeys
     player!: PlayerSprite;
     players!: string[];
     keys!: Keys
-    socket!: WebSocket
+    gameState!: Snapshot
+    network!: NetworkManager
     constructor() {
         super("main")
     }
@@ -37,8 +33,9 @@ export default class MainScene extends Phaser.Scene {
             frameHeight: 48,
             margin: 0,
             spacing: 0
-        })
-    }
+        });
+        this.network = (this.game as MyGame).connectToNetwork()
+    }   
 
     create() {
         const map = this.make.tilemap({ key: "main_map" })
@@ -82,6 +79,17 @@ export default class MainScene extends Phaser.Scene {
             down: Phaser.Input.Keyboard.KeyCodes.S
         }) as Keys;
 
+        this.network.on("snapshot", (snapshot: Snapshot) => {
+            console.log("event fired")
+            console.log(snapshot)
+        })
+        this.network.on("move", (move: MoveEvent) => {
+            console.log(move)
+            console.log("move")
+        })
+
+         
+        // Debug Graphics for colliding tiles
         // const debugGraphics = this.add.graphics().setAlpha(0.7);
         // waterLayer?.renderDebug(debugGraphics, {
         //     tileColor: null,
@@ -129,19 +137,8 @@ export default class MainScene extends Phaser.Scene {
                 this.player.anims.timeScale = 0.3;
                 return
             }
-            if (this.socket.readyState === WebSocket.OPEN) {
-                const buffer = new ArrayBuffer(13);
-                const view = new DataView(buffer);
-
-                view.setFloat32(0, this.player.x, true);
-                view.setFloat32(4, this.player.y, true);
-
-                this.socket.send(buffer);
-                // this.socket.send(JSON.stringify({
-                //     "x": this.player.x,
-                //     "y": this.player.y
-                // }))
-            }
+            this.network.sendMove(this.player.id,this.player.x,this.player.y)
+            moving = false
         }
 
         if (!moving) {

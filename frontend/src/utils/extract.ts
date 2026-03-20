@@ -1,21 +1,50 @@
+import { stringify } from "uuid"
+
 export const PlayerSize = 12
 
 // # Snapshot extraction logic
 export type Snapshot = {
+    room_id: string,
     players: string[]
 }
 
 
-export const extractSnapshotFromDataview = (player_id: string,buffer: ArrayBuffer): Snapshot => {
+export type MoveEvent = {
+    player: Uint8Array,
+    x: number,
+    y: number
+}
+
+export const extractSnapshotFromDataview = (buffer: ArrayBuffer): Snapshot => {
+    const bytes = new Uint8Array(buffer)
+    const room_id = new Uint8Array(bytes.slice(1, 17));
+    const room = stringify(room_id)
     const players = [];
     // const decoder = new TextDecoder("utf-8")
-    for (let offset = 1; offset < buffer.byteLength; offset += PlayerSize) {
-        const id = new Uint8Array(buffer.slice(offset, offset + PlayerSize))
+    const count = bytes[17];
+    let offset = 18;
+    for (let i = 0; i < count; i++) {
+        const id = bytes.subarray(offset, offset + PlayerSize);
+
         const hex = [...id]
             .map(b => b.toString(16).padStart(2, "0"))
-            .join("")
-        if(player_id===hex) continue;
-        players.push(hex) 
+            .join("");
+
+        players.push(hex);
+
+
+        offset += PlayerSize;
     }
-    return { players }
+    return { room_id: room, players }
+}
+
+export const extractPlayerMoveFromBuffer = (buffer: ArrayBuffer): MoveEvent => {
+    const bytes = new Uint8Array(buffer)
+    const id = bytes.subarray(1, 13)
+    const [x, y] = [bytes[13], bytes[14]]
+    return {
+        player: id,
+        x, 
+        y
+    }
 }

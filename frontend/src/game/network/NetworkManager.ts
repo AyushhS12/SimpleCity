@@ -1,22 +1,30 @@
+import { extractPlayerMoveFromBuffer, extractSnapshotFromDataview } from "../../utils/extract"
+export enum PacketType {
+    Snapshot,
+    PlayerJoined,
+    PlayerLeft,
+    PlayerMoved,
+}
 
-export const PacketType = {
-    Snapshot: 0,
-    PlayerJoined: 1,
-    PlayerLeft: 2,
-    PlayerMoved: 3
-} as const
 
-export default class NetworkManager {
+export default class NetworkManager extends Phaser.Events.EventEmitter {
     socket: WebSocket
     constructor(url: string) {
+        super()
         this.socket = new WebSocket(url)
+        this.socket.binaryType = "arraybuffer"
         this.socket.onmessage = (e) => {
-            const view = new DataView(e.data as ArrayBuffer);
+            const view = new DataView(e.data);
             const packetType = view.getUint8(0)
             switch (packetType) {
                 case PacketType.Snapshot: {
-                    // this.players = extractSnapshotFromDataview( e.data).players;
-                    // console.log(this.players)s
+                    const snapshot = extractSnapshotFromDataview(view.buffer)
+                    this.emit("snapshot", snapshot)
+                    break
+                }
+                case PacketType.PlayerMoved: {
+                    const move = extractPlayerMoveFromBuffer(view.buffer)
+                    this.emit("move", move)
                     break
                 }
                 case PacketType.PlayerJoined: {
@@ -25,10 +33,8 @@ export default class NetworkManager {
                 case PacketType.PlayerLeft: {
                     break
                 }
-                case PacketType.PlayerMoved: {
-                    break
-                }
             }
+
             // const position: Position = { x: view.getFloat32(0, true), y: view.getFloat32(4, true) };
             // console.log(position);
         }
@@ -36,4 +42,27 @@ export default class NetworkManager {
             console.log(e)
         }
     }
+
+    sendMove(id: string, x: number, y: number) {
+        const buffer = new ArrayBuffer(21)
+        const view = new DataView(buffer)
+
+        view.setUint8(0, PacketType.PlayerMoved)
+
+        for (let i = 0; i < 12; i++) {
+            const byte = parseInt(id.slice(i * 2, i * 2 + 2), 16);
+            view.setUint8(1+i, byte)
+        }
+        
+        view.setFloat32(13, x)
+        view.setFloat32(17, y)
+
+        this.socket.send(buffer)
+    }
+    // send(type: PacketType,data: unknown){
+    //     const buffer = new ArrayBuffer()
+    //     const view = new DataView(buffer)
+    //     view.setUint8(0, type)
+    //     this.socket.send(buffer)
+    // }
 }

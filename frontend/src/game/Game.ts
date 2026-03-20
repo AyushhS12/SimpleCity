@@ -24,5 +24,6 @@ export class MyGame extends Phaser.Game{
     
     connectToNetwork(){
         this.network = new NetworkManager("ws://localhost:7878/world")
+        return this.network
     }
 }

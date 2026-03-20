@@ -10,3 +10,7 @@ export interface Player {
     email: string,
     password: string,
 }
+
+export interface PlayerDetails {
+    id: string,
+}
