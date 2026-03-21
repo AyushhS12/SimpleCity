@@ -1,4 +1,4 @@
-import type { MoveEvent, Snapshot } from "../../utils/extract";
+import { type MoveEvent, type Snapshot } from "../../utils/extract";
 import { PlayerGroup, PlayerSprite } from "../Entities/Player";
 import type { MyGame } from "../Game";
 import type NetworkManager from "../network/NetworkManager";
@@ -13,7 +13,7 @@ type Keys = {
 export default class MainScene extends Phaser.Scene {
     cursors!: Phaser.Types.Input.Keyboard.CursorKeys
     player!: PlayerSprite;
-    players!: string[];
+    players!: Map<string, PlayerSprite>;
     keys!: Keys
     gameState!: Snapshot
     network!: NetworkManager
@@ -80,12 +80,15 @@ export default class MainScene extends Phaser.Scene {
         }) as Keys;
 
         this.network.on("snapshot", (snapshot: Snapshot) => {
-            console.log("event fired")
+            snapshot.players.forEach((x) => {
+                this.players.set(x, this.players.get(x)!)
+            })
             console.log(snapshot)
         })
         this.network.on("move", (move: MoveEvent) => {
-            console.log(move)
-            console.log("move")
+            if(!(this.player.id === move.player)){
+                console.log(move)
+            }
         })
 
          

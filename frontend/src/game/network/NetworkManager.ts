@@ -15,6 +15,7 @@ export default class NetworkManager extends Phaser.Events.EventEmitter {
         this.socket = new WebSocket(url)
         this.socket.binaryType = "arraybuffer"
         this.socket.onmessage = (e) => {
+            console.log(e.data)
             const view = new DataView(e.data);
             const packetType = view.getUint8(0)
             switch (packetType) {
@@ -36,9 +37,6 @@ export default class NetworkManager extends Phaser.Events.EventEmitter {
                     break
                 }
             }
-
-            // const position: Position = { x: view.getFloat32(0, true), y: view.getFloat32(4, true) };
-            // console.log(position);
         }
         this.socket.onclose = (e) => {
             console.log(e)
@@ -56,8 +54,8 @@ export default class NetworkManager extends Phaser.Events.EventEmitter {
             view.setUint8(1 + i, byte)
         }
 
-        view.setFloat32(13, x)
-        view.setFloat32(17, y)
+        view.setFloat32(13, x, true)
+        view.setFloat32(17, y, true)
 
         this.socket.send(buffer)
     }
