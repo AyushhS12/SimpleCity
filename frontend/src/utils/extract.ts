@@ -1,3 +1,6 @@
+import type { PlayerSprite } from "../game/Entities/Player"
+import type { Direction } from "../game/network/NetworkManager"
+
 export const PlayerSize = 12
 
 // # Snapshot extraction logic
@@ -9,21 +12,30 @@ export type Snapshot = {
 
 export type MoveEvent = {
     player: string,
+    direction:Direction,
     x: number,
     y: number
+}
+
+export const extractPlayerJoinedFromBuffer = (buffer: ArrayBuffer)=>{
+    const bytes = new Uint8Array(buffer)
+
+    const id = bytes.slice(1,13)
+    return convertUint8IntoHex(id)
 }
 
 export const extractSnapshotFromDataview = (buffer: ArrayBuffer): Snapshot => {
     const bytes = new Uint8Array(buffer)
     const room_id = new Uint8Array(bytes.slice(1, 17))
-    const players = [];
     const current = bytes.slice(17, 29)
-    const count = bytes[30];
+    const players = [];
+    const count = bytes[29];
     let offset = 30;
     for (let i = 0; i < count; i++) {
         const id = bytes.subarray(offset, offset + PlayerSize);
-
-        players.push(convertUint8IntoHex(id));
+        const hex = convertUint8IntoHex(id)
+        console.log(hex)
+        players.push(hex);
 
 
         offset += PlayerSize;
@@ -33,15 +45,24 @@ export const extractSnapshotFromDataview = (buffer: ArrayBuffer): Snapshot => {
 
 export const extractPlayerMoveFromBuffer = (buffer: ArrayBuffer): MoveEvent => {
     const bytes = new Uint8Array(buffer)
-    const id = bytes.subarray(1, 13)
     const view = new DataView(buffer)
-    const [x, y] = [view.getFloat32(13,true), view.getFloat32(17,true)]
+    const direction = view.getUint8(1);
+    const id = bytes.subarray(2, 14)
+    const [x, y] = [view.getFloat32(14, true), view.getFloat32(18, true)]
     return {
         player: convertUint8IntoHex(id),
+        direction,
         x,
         y
     }
 }
+
+
+// export const extractLeaveEventFromBuffer = (buffer: ArrayBuffer) => {
+//     const bytes = new Uint8Array(buffer)
+
+// }
+
 
 export const convertUint8IntoHex = (id: Uint8Array) => {
     if (id.length !== 12) {
@@ -66,4 +87,12 @@ export const convertHexIntoUint8 = (id: string) => {
         bytes[i] = byte
     }
     return bytes
+}
+
+
+export const getDistance = (player: PlayerSprite, x: number, y: number) => {
+    const X = (player.x - x)
+    const Y = (player.y - y)
+
+    return Math.sqrt((X*X) + (Y*Y))
 }

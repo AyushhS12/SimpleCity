@@ -1,16 +1,30 @@
+import { PlayerAnims } from "../../utils/keys";
 import type { Player } from "../../utils/models";
 
 export class PlayerSprite extends Phaser.Physics.Arcade.Sprite {
 
-    private nameTag: Phaser.GameObjects.Text;
+    private nameTag!: Phaser.GameObjects.Text;
     public id: string
-
+    public targetX: number
+    public targetY: number
+    public direction: number = 1
+    public moving: boolean = false
     constructor(scene: Phaser.Scene, x: number, y: number, texture: string) {
         super(scene, x, y, texture)
         const player = scene.registry.get("player") as Player
-        console.log(player)
+        this.targetX = x
+        this.targetY = y
         this.id = player._id.$oid
-        this.nameTag = scene.add.text(x, y - 20, player.username, { fontSize: '12px' }).setOrigin(0.5)
+    }
+
+    setNameTag(name: string) {
+        if (name === "") {
+            const player = this.scene.registry.get("player") as Player
+            name = player.username
+            this.nameTag = this.scene.add.text(this.x, this.y - 20, name, { fontSize: '12px' }).setOrigin(0.5)
+            return
+        }
+        this.nameTag = this.scene.add.text(this.x, this.y - 20, name, { fontSize: '12px' }).setOrigin(0.5)
     }
 
     preUpdate(time: number, delta: number) {
@@ -19,33 +33,33 @@ export class PlayerSprite extends Phaser.Physics.Arcade.Sprite {
     }
 
     static createAnims(anims: Phaser.Animations.AnimationManager) {
-        if(anims.exists("idle")) return;
+        if (anims.exists(PlayerAnims.IDLE)) return;
         anims.create({
-            key: "idle",
+            key: PlayerAnims.IDLE,
             frames: anims.generateFrameNumbers("player", { start: 0, end: 1 }),
             frameRate: 3,
             repeat: -1
         })
         anims.create({
-            key: "walk-left",
+            key: PlayerAnims.WALK_LEFT,
             frames: anims.generateFrameNumbers("player", { start: 8, end: 11 }),
             frameRate: 15,
             repeat: -1
         })
         anims.create({
-            key: "walk-right",
+            key: PlayerAnims.WALK_RIGHT,
             frames: anims.generateFrameNumbers("player", { start: 12, end: 15 }),
             frameRate: 15,
             repeat: -1
         })
         anims.create({
-            key: "walk-up",
+            key: PlayerAnims.WALK_UP,
             frames: anims.generateFrameNumbers("player", { start: 4, end: 7 }),
             frameRate: 15,
             repeat: -1
         })
         anims.create({
-            key: "walk-down",
+            key: PlayerAnims.WALK_DOWN,
             frames: anims.generateFrameNumbers("player", { start: 2, end: 3 }),
             frameRate: 15,
             repeat: -1
@@ -62,12 +76,13 @@ export class PlayerGroup extends Phaser.Physics.Arcade.Group {
         PlayerSprite.createAnims(scene.anims)
     }
 
-    addPlayer(x: number, y: number): PlayerSprite {
+    addPlayer(name: string, x: number, y: number): PlayerSprite {
         const newPlayer: PlayerSprite = this.create(x, y, "player");
+        newPlayer.setNameTag(name)
         if (newPlayer) {
             newPlayer.setBodySize(16, 16)
             newPlayer.setCollideWorldBounds(true)
-            newPlayer.play("idle")
+            newPlayer.play(PlayerAnims.IDLE)
         }
         return newPlayer;
     }
