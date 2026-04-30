@@ -9,6 +9,7 @@ import {
   Globe,
   CircleCheck,
   CircleX,
+  Text,
 } from "lucide-react"
 import axios from "axios"
 import { toast } from "react-hot-toast"
@@ -16,6 +17,7 @@ import { usePlayerContext } from "../context/usePlayerContext"
 import type { Player } from "../utils/models"
 
 interface AuthForm {
+  name: string
   username: string
   email: string
   password: string
@@ -31,6 +33,7 @@ const Auth = () => {
   )
 
   const [form, setForm] = useState<AuthForm>({
+    name: "",
     username: "",
     email: "",
     password: "",
@@ -47,7 +50,7 @@ const Auth = () => {
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
 
-    if (!["username", "email", "password"].includes(name)) {
+    if (!["name","username", "email", "password"].includes(name)) {
       return
     }
 
@@ -110,21 +113,25 @@ const Auth = () => {
         })
       }
     } catch (e) {
+      toast.success("Invalid Credentials", {
+          id: toastId,
+          icon: <CircleX className="text-red-500" />,
+      })
       console.log(e)
     }
   }, [form, navigate, setPlayer])
 
   const signup = useCallback(async (toastId: string) => {
-    const { username, email, password } = form
+    const { name, username, email, password } = form
 
-    if (!username || !email || !password) {
+    if (!name || !username || !email || !password) {
       toast.error("All fields are required", { id: toastId })
       return
     }
 
     const res = await axios.post<{ success: boolean }>(
       "http://localhost:7878/auth/signup",
-      { username, email, password },
+      { name,username, email, password },
       { withCredentials: true }
     )
 
@@ -239,6 +246,17 @@ const Auth = () => {
                 setFocused={setFocused}
               />
             )}
+
+            {isSignup && <Input
+              icon={<Text />}
+              name="name"
+              type="text"
+              placeholder="Enter Your Name"
+              value={form.name}
+              onChange={handleChange}
+              focused={focused}
+              setFocused={setFocused}
+            />}
 
             <Input
               icon={<Mail />}

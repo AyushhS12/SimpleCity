@@ -18,12 +18,8 @@ export default function GameCanvas() {
       icon: <Loader2Icon />
     })
     try {
-      // if (!setPlayer) {
-      //   return
-      // }
-      const res = await axios.get("http://localhost:7878/player/stats", { withCredentials: true })
-      game.registry.set("player",res.data)
-      // setPlayer(res.data)
+      const res = await axios.get("http://localhost:7878/player/info", { withCredentials: true })
+      game.registry.set("player", res.data)
       toast.success("Player Entered Successfully", {
         id: toastId,
         duration: 1800,

@@ -1,4 +1,11 @@
 
+export type PlayerId = bigint
+
+export type Players = {
+    id:bigint,
+    username:string
+}[]
+
 interface Id {
     $oid: string
 }
@@ -12,5 +19,6 @@ export interface Player {
 }
 
 export interface PlayerDetails {
-    id: string,
+    id: bigint,
+    username:string
 }

@@ -4,25 +4,24 @@ import type { Player } from "../../utils/models";
 export class PlayerSprite extends Phaser.Physics.Arcade.Sprite {
 
     private nameTag!: Phaser.GameObjects.Text;
-    public id: string
+    public id: bigint
+    public username: string = ""
     public targetX: number
     public targetY: number
     public direction: number = 1
     public moving: boolean = false
     constructor(scene: Phaser.Scene, x: number, y: number, texture: string) {
         super(scene, x, y, texture)
-        const player = scene.registry.get("player") as Player
+        const player = scene.registry.get("player")
         this.targetX = x
         this.targetY = y
-        this.id = player._id.$oid
+        this.id = player.id
     }
 
     setNameTag(name: string) {
         if (name === "") {
             const player = this.scene.registry.get("player") as Player
             name = player.username
-            this.nameTag = this.scene.add.text(this.x, this.y - 20, name, { fontSize: '12px' }).setOrigin(0.5)
-            return
         }
         this.nameTag = this.scene.add.text(this.x, this.y - 20, name, { fontSize: '12px' }).setOrigin(0.5)
     }

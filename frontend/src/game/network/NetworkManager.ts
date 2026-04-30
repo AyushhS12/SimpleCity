@@ -1,9 +1,11 @@
-import { convertUint8IntoHex, extractPlayerJoinedFromBuffer, extractPlayerMoveFromBuffer, extractSnapshotFromDataview } from "../../utils/extract"
+import { extractPlayerJoinedFromBuffer, extractPlayerMoveFromBuffer, extractSnapshotFromDataview } from "../../utils/utils"
 export enum PacketType {
     Snapshot,
     PlayerJoined,
     PlayerLeft,
     PlayerMoved,
+    Ping,
+    Pong
 }
 export enum Direction {
     Up,
@@ -15,7 +17,7 @@ export enum Direction {
 
 export default class NetworkManager extends Phaser.Events.EventEmitter {
     socket: WebSocket
-    id!: Uint8Array
+    id!: bigint
     constructor(url: string) {
         super()
         this.socket = new WebSocket(url)
@@ -28,29 +30,31 @@ export default class NetworkManager extends Phaser.Events.EventEmitter {
                 case PacketType.Snapshot: {
                     const snapshot = extractSnapshotFromDataview(view.buffer)
                     this.id = snapshot.current_player
-                    console.log(convertUint8IntoHex(this.id))
                     this.emit("snapshot", snapshot)
-                    console.log(snapshot)
                     break
                 }
                 case PacketType.PlayerMoved: {
                     const move = extractPlayerMoveFromBuffer(view.buffer)
                     this.emit("move", move)
-                    // console.log(move)
                     break
                 }
                 case PacketType.PlayerJoined: {
                     const event = extractPlayerJoinedFromBuffer(view.buffer)
-                    // console.log(event)
                     this.emit("joined", event)
                     break
                 }
                 case PacketType.PlayerLeft: {
-                    // const player = extractLeaveEventFromBuffer(view.buffer)
-                    console.log(packetType)
-                    console.log("PLayer left")
-                    this.emit("left", )
+                    const player = view.getBigInt64(1, true);
+                    console.log("Player with id " + player + " left")
+                    this.emit("left", player)
                     break
+                }
+                case PacketType.Ping: {
+                    const bytes = new DataView(new ArrayBuffer(9))
+                    bytes.setUint8(0,PacketType.Pong)
+                    bytes.setBigInt64(1, this.id,true)
+                    this.socket.send(bytes.buffer);
+                    console.log(new Uint8Array(bytes.buffer))
                 }
             }
         }
@@ -60,25 +64,18 @@ export default class NetworkManager extends Phaser.Events.EventEmitter {
     }
 
     sendMove(direction: Direction, x: number, y: number) {
-        const buffer = new ArrayBuffer(22)
+        const buffer = new ArrayBuffer(18)
         const view = new DataView(buffer)
 
         view.setUint8(0, PacketType.PlayerMoved)
         view.setUint8(1, direction)
-        for (let i = 0; i < 12; i++) {
-            const byte = this.id[i];
-            view.setUint8(2 + i, byte)
-        }
 
-        view.setFloat32(14, x, true)
-        view.setFloat32(18, y, true)
+        // write i64 to player id
+        view.setBigInt64(2, this.id, true)
+
+        view.setFloat32(10, x, true)
+        view.setFloat32(14, y, true)
 
         this.socket.send(buffer)
     }
-    // send(type: PacketType,data: unknown){
-    //     const buffer = new ArrayBuffer()
-    //     const view = new DataView(buffer)
-    //     view.setUint8(0, type)
-    //     this.socket.send(buffer)
-    // }
 }
